@@ -1,0 +1,12 @@
+{
+    "name": "root/wp-oauth-framework",
+    "authors": [
+        {
+            "name": "Koen Gabriels",
+            "email": "koeng@appsaloon.be"
+        }
+    ],
+    "require": {
+        "fkooman/oauth-client": "dev-master"
+    }
+}
