@@ -14,3 +14,8 @@
  * Author:            Koen Gabriëls
  * Author URI:        http://www.appsaloon.be
  */
+
+require_once __DIR__ . '/classes/login-manager.php';
+require_once __DIR__ . '/classes/main-page.php';
+
+new \wp_oauth_framework\classes\Main_Page();
