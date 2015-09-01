@@ -16,6 +16,7 @@
  */
 
 require_once __DIR__ . '/classes/login-manager.php';
-require_once __DIR__ . '/classes/main-page.php';
+require_once __DIR__ . '/classes/admin-menu.php';
+require_once __DIR__ . '/classes/oauth-service.php';
 
-new \wp_oauth_framework\classes\Main_Page();
+new \wp_oauth_framework\classes\Admin_Menu();
