@@ -20,3 +20,4 @@ require_once __DIR__ . '/classes/admin-menu.php';
 require_once __DIR__ . '/classes/oauth-service.php';
 
 new \wp_oauth_framework\classes\Admin_Menu();
+new \wp_oauth_framework\Login_Manager();
