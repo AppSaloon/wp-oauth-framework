@@ -42,11 +42,8 @@ namespace wp_oauth_framework\classes {
             'default_token_type', // defined by child plugin
         );
 
-        protected $login_suffix;
-
         public function __construct($service_name, $config)
         {
-            $this->login_suffix = 1;
             $this->service_name = $service_name;
             $this->config_parameters = $config;
 
@@ -304,12 +301,17 @@ namespace wp_oauth_framework\classes {
                 header( 'Location:' . home_url() );
         }
 
-        public function get_new_user_name( $given_name ) {
-            if( get_user_by( 'login', sanitize_title( $given_name ) ) ) {
-                $this->login_suffix++;
-                return $this->get_new_user_name( $given_name . $this->login_suffix );
+        public function get_new_user_name( $given_name, $suffix = 0 ) {
+            if( $suffix > 0 ) {
+                $name_to_check = $given_name . $suffix;
             } else {
-                return sanitize_title( $given_name );
+                $name_to_check = $given_name;
+            }
+
+            if( get_user_by( 'login', sanitize_title( $name_to_check ) ) ) {
+                return $this->get_new_user_name( $given_name , $suffix + 1 );
+            } else {
+                return sanitize_title( $name_to_check );
             }
 
         }
