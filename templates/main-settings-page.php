@@ -1,4 +1,6 @@
 <?php
+    defined( 'ABSPATH' ) or die( "No script kiddies please!" );
+
     if( ! current_user_can( \wp_oauth_framework\classes\Admin_Menu::REQUIRED_CAPABILITY ) ) {
         wp_die( 'Nice try but no sigar' );
     }

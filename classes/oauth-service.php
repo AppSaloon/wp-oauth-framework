@@ -2,6 +2,9 @@
 
 
 namespace wp_oauth_framework\classes {
+
+    defined( 'ABSPATH' ) or die( "No script kiddies please!" );
+
     use fkooman\OAuth\Client\AccessToken;
     use fkooman\OAuth\Client\Api;
     use fkooman\OAuth\Client\Context;
@@ -182,10 +185,44 @@ namespace wp_oauth_framework\classes {
 
         public function get_login_url()
         {
-            $login_url = wp_login_url() . '?oauth=' . $this->service_name;
-            return sprintf('<p><a href="%s">%s</a>', $login_url, $this->service_name);
-//        return '<p><a href="'. wp_login_url() . '?oauth=' . $this->get_service_name() . '">' . $this->get_service_name() . '</a></p>';
+            return wp_login_url() . '?oauth=' . $this->service_name;
+        }
 
+        public function display_login_button() {
+            include $this->get_template_path( 'template-login-button.php' );
+        }
+
+        public function get_template_path( $file_name ) {
+            $theme_folder = get_template_directory() . '/wp-oauth-framework/' . $this->submenu_slug .'/templates';
+            $plugin_folder = $this->get_client_config()->get_plugin_folder() . '/templates';
+            $framework_folder = __DIR__ . '/../templates/';
+
+            if( file_exists( $theme_folder . '/' . $file_name ) ) {
+                return $theme_folder . '/' . $file_name;
+            }elseif( file_exists( $plugin_folder . '/' . $file_name ) ) {
+                return $plugin_folder . '/' . $file_name;
+            }else {
+                return $framework_folder . '/' . $file_name;
+            }
+        }
+
+        public function display_logo() {
+            ?>
+            <img src="<?php echo $this->get_image_url( 'logo.png' );?>" >
+        <?php
+        }
+
+        public function get_image_url( $file_name ) {
+            $theme_folder = get_template_directory() . '/wp-oauth-framework/' . $this->submenu_slug . '/images';
+            $plugin_folder = $this->get_client_config()->get_plugin_folder() . '/images';
+
+            if( file_exists( $theme_folder . '/' . $file_name ) ) {
+                return get_template_directory_uri() . '/' . $file_name;
+            }elseif( file_exists( $plugin_folder . '/' . $file_name ) ) {
+                return plugin_dir_url( $this->get_client_config()->get_plugin_file() ) . 'images/' . $file_name;
+            }else {
+                return plugin_dir_url( __FILE__ ) . '../images/' . $file_name;
+            }
         }
 
         /**

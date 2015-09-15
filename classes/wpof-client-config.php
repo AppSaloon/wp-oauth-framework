@@ -1,6 +1,8 @@
 <?php
 namespace wp_oauth_framework\classes;
 
+defined( 'ABSPATH' ) or die( "No script kiddies please!" );
+
 use fkooman\OAuth\Client\ClientConfig;
 use fkooman\OAuth\Client\ClientConfigInterface;
 
@@ -11,6 +13,8 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
     protected $user_id_key;
     protected $user_name_key;
     protected $user_email_key;
+    protected $plugin_folder;
+    protected $plugin_file;
     protected $scope;
 
     public function __construct(array $data) {
@@ -22,6 +26,9 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
         $this->user_info_endpoint = $data['user_info_endpoint'];
         $this->user_info_endpoint_method = strtolower( $data['user_info_endpoint_method'] );
         $this->set_user_info_keys_for_response( $data );
+
+        $this->plugin_folder = $data['plugin_folder'];
+        $this->plugin_file = $data['plugin_file'];
 
         $this->scope = $data['scope'];
         parent::__construct( $data );
@@ -47,6 +54,14 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
 
     public function get_user_email_key() {
         return $this->user_email_key;
+    }
+
+    public function get_plugin_folder() {
+        return $this->plugin_folder;
+    }
+
+    public function get_plugin_file() {
+        return $this->plugin_file;
     }
 
     public function get_scope() {

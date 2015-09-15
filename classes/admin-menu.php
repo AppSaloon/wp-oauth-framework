@@ -2,6 +2,8 @@
 
 namespace wp_oauth_framework\classes;
 
+defined( 'ABSPATH' ) or die( "No script kiddies please!" );
+
 class Admin_Menu {
 
     const PAGE_TITLE = 'WP OAuth Framework';

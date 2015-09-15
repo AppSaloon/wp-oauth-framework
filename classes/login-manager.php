@@ -1,16 +1,11 @@
 <?php
 
 namespace wp_oauth_framework {
-//    use Guzzle\Http\Client;
-//    use fkooman\OAuth\Client\GoogleClientConfig;
+    defined( 'ABSPATH' ) or die( "No script kiddies please!" );
+
     use fkooman\OAuth\Client\Callback;
-//    use fkooman\OAuth\Client\SessionStorage;
-//    use fkooman\OAuth\Client\PdoStorage;
     use fkooman\OAuth\Client\Guzzle3Client;
     use wp_oauth_framework\classes\Oauth_Service;
-//    use fkooman\OAuth\Client\Context;
-//    use Guzzle\Http\Exception\ClientErrorResponseException;
-
 
     require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -27,13 +22,28 @@ namespace wp_oauth_framework {
             add_action('wp_ajax_nopriv_wpof_callback', array($this, 'oauth_callback'));
         }
 
-        public function display_login_buttons()
-        {
-            echo '<p>' . __( 'Login using') . ':</p>';
+        public function display_login_buttons() {
+            include $this->get_file_path( 'template-social-logins.php' );
+        }
+
+        public function get_registered_services() {
+            $registered_services = array();
             foreach (apply_filters('wpof_registered_services', array()) as $reqistered_service) {
                 if( $reqistered_service->has_valid_api_credentials() ) {
-                    echo $reqistered_service->get_login_url();
+                    $registered_services[] = $reqistered_service;
                 }
+            }
+            return $registered_services;
+        }
+
+        public function get_file_path( $file_name ) {
+            $theme_folder = get_template_directory() . '/wp-oauth-framework/templates';
+            $framework_folder = __DIR__ . '/../templates';
+
+            if( file_exists( $theme_folder . '/' . $file_name ) ) {
+                return $theme_folder . '/' . $file_name;
+            }else {
+                return $framework_folder . '/' . $file_name;
             }
         }
 

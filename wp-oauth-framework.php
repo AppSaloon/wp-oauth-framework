@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( "No script kiddies please!" );
+
 /**
  * WordPress OAuth Frame work
  *
