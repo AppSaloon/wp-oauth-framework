@@ -85,7 +85,7 @@ namespace wp_oauth_framework\classes {
             if (! isset( $_SESSION[$this->submenu_slug] ) ) {
                 $_SESSION[$this->submenu_slug] = array( 'uuid' => sha1( openssl_random_pseudo_bytes( 1024 ) ) );
             }
-            $this->context = new Context( $_SESSION[$this->submenu_slug]['uuid'] , array( 'openid', 'email' ) );
+            $this->context = new Context( $_SESSION[$this->submenu_slug]['uuid'] , $this->get_client_config()->get_scope() );
         }
 
         public function add_settings()
@@ -245,14 +245,20 @@ namespace wp_oauth_framework\classes {
         public function handle_access_token( AccessToken $access_token) {
             try {
                 $client = new Client();
-                $request = $client->post( $this->get_client_config()->get_user_info_endpoint() );
+                if( $this->get_client_config()->get_user_info_endpoint_method() == 'post' ) {
+                    $request = $client->post( $this->get_client_config()->get_user_info_endpoint() );
+                } else {
+                    $request = $client->get( $this->get_client_config()->get_user_info_endpoint() );
+                }
+
                 $request->addHeader('Authorization', sprintf('Bearer %s', $access_token->getAccessToken()));
 
                 $response = $request->send();
+
                 $user_info = json_decode( (string) $response->getBody() );
 
-                $user_meta_key = $this->get_client_config()->get_user_id_key();
-                $user_id_for_service = $user_info->{$user_meta_key};
+                $user_id_key = $this->get_client_config()->get_user_id_key();
+                $user_id_for_service = $user_info->{$user_id_key};
 
                 $user_query = new \WP_User_Query(
                     array(
@@ -288,9 +294,12 @@ namespace wp_oauth_framework\classes {
         }
 
         public function create_new_wp_user( $user_info, $user_id_for_service ) {
-            $user_name = $this->get_new_user_name( $user_info->given_name );
+            $user_name_key = $this->get_client_config()->get_user_name_key();
+            $user_email_key = $this->get_client_config()->get_user_email_key();
+
+            $user_name = $this->get_new_user_name( $user_info->{$user_name_key} );
             $password = sha1( openssl_random_pseudo_bytes( 64 ) );
-            $user_id = wp_create_user( $user_name, $password , $user_info->email );
+            $user_id = wp_create_user( $user_name, $password , $user_info->{$user_email_key} );
             add_user_meta( $user_id, $this->submenu_slug . '_id', $user_id_for_service );
 
             $this->login_wp_user( $user_id );
