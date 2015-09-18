@@ -20,6 +20,9 @@ namespace wp_oauth_framework {
             add_action('login_init', array($this, 'login_init'));
             add_action('wp_ajax_wpof_callback', array($this, 'oauth_callback'));
             add_action('wp_ajax_nopriv_wpof_callback', array($this, 'oauth_callback'));
+
+            add_action( 'login_enqueue_scripts', array( $this, 'enqueue_scripts_and_styles') );
+
         }
 
         public function display_login_buttons() {
@@ -60,6 +63,14 @@ namespace wp_oauth_framework {
                 echo 'No script kiddies!';
                 die;
             }
+        }
+
+        public function enqueue_scripts_and_styles() {
+            wp_register_script( 'wpof-position-social-logins', plugins_url( 'js/position-social-logins.js', __DIR__  ) );
+            wp_enqueue_script( 'wpof-position-social-logins' );
+
+            wp_register_style( 'wpof-social-logins', plugins_url( 'css/social-logins.js', __DIR__ ) );
+            wp_enqueue_style( 'wpof-social-logins' );
         }
 
         public function oauth_callback() {
