@@ -1,0 +1,1 @@
+jQuery('#login .submit').after( jQuery('.wpof-social-logins-container') );

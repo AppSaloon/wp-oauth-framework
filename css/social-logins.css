@@ -1,0 +1,48 @@
+.wpof-social-logins-container {
+    margin-top: 45px;
+}
+
+.wpof-social-logins-container .wpof-login a{
+    display: block;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 26px;
+    height: 28px;
+    margin: 10px 0px;
+    padding: 5px 10px 1px;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    -webkit-appearance: none;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.wpof-login-Facebook a {
+    background: #4060A5;
+    color: #ffffff;
+}
+
+.wpof-login-Facebook a:hover {
+    background:#5172b8;
+}
+
+.wpof-login-Google a {
+    background: #F44336;
+    color: #ffffff;
+}
+
+.wpof-login-Google a:hover {
+    background:#EF5350;
+}
+
+.wpof-login-KlasCement a {
+    background: #F7931B;
+    color: #ffffff;
+}
+
+.wpof-login-KlasCement a:hover {
+    background:#F79B3B;
+}

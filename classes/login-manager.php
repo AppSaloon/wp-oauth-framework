@@ -66,10 +66,10 @@ namespace wp_oauth_framework {
         }
 
         public function enqueue_scripts_and_styles() {
-            wp_register_script( 'wpof-position-social-logins', plugins_url( 'js/position-social-logins.js', __DIR__  ) );
+            wp_register_script( 'wpof-position-social-logins', plugins_url( 'js/position-social-logins.js', __DIR__  ), array( 'jquery'), '1.0', true );
             wp_enqueue_script( 'wpof-position-social-logins' );
 
-            wp_register_style( 'wpof-social-logins', plugins_url( 'css/social-logins.js', __DIR__ ) );
+            wp_register_style( 'wpof-social-logins', plugins_url( 'css/social-logins.css', __DIR__ ) );
             wp_enqueue_style( 'wpof-social-logins' );
         }
 
