@@ -71,6 +71,10 @@ namespace wp_oauth_framework {
 
             wp_register_style( 'wpof-social-logins', plugins_url( 'css/social-logins.css', __DIR__ ) );
             wp_enqueue_style( 'wpof-social-logins' );
+
+            foreach( self::get_registered_services() as $registered_service ) {
+                $registered_service->enqueue_style();
+            }
         }
 
         public function oauth_callback() {

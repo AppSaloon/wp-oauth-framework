@@ -19,30 +19,3 @@
     border-radius: 5px;
     white-space: nowrap;
 }
-
-.wpof-login-Facebook a {
-    background: #4060A5;
-    color: #ffffff;
-}
-
-.wpof-login-Facebook a:hover {
-    background:#5172b8;
-}
-
-.wpof-login-Google a {
-    background: #F44336;
-    color: #ffffff;
-}
-
-.wpof-login-Google a:hover {
-    background:#EF5350;
-}
-
-.wpof-login-KlasCement a {
-    background: #F7931B;
-    color: #ffffff;
-}
-
-.wpof-login-KlasCement a:hover {
-    background:#F79B3B;
-}

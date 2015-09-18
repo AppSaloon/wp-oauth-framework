@@ -355,5 +355,13 @@ namespace wp_oauth_framework\classes {
                 unset( $_SESSION[$this->submenu_slug] );
             }
         }
+
+        public function enqueue_style() {
+            $style_url = $this->get_client_config()->get_style_url();
+            if( $style_url ) {
+                wp_register_style( 'wpof-social-login-' . $this->submenu_slug, $style_url );
+                wp_enqueue_style( 'wpof-social-login-' . $this->submenu_slug );
+            }
+        }
     }
 }

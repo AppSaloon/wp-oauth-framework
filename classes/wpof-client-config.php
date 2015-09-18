@@ -15,6 +15,7 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
     protected $user_email_key;
     protected $plugin_folder;
     protected $plugin_file;
+    protected $style_url;
     protected $scope;
 
     public function __construct(array $data) {
@@ -29,6 +30,8 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
 
         $this->plugin_folder = $data['plugin_folder'];
         $this->plugin_file = $data['plugin_file'];
+
+        $this->style_url = isset( $data['style_url'] ) ? $data['style_url'] : false;
 
         $this->scope = $data['scope'];
         parent::__construct( $data );
@@ -62,6 +65,10 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
 
     public function get_plugin_file() {
         return $this->plugin_file;
+    }
+
+    public function get_style_url() {
+        return $this->style_url;
     }
 
     public function get_scope() {
