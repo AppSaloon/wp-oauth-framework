@@ -29,5 +29,15 @@ namespace wp_oauth_framework {
                 return $framework_folder . '/' . $file_name;
             }
         }
+
+        public static function get_style_url_for_theme_override( $file_name ) {
+            $theme_folder = get_template_directory() . '/wp-oauth-framework/css';
+
+            if( file_exists( $theme_folder . '/' . $file_name ) ) {
+                return get_template_directory_uri() . '/wp-oauth-framework/css/' . $file_name;
+            }else {
+                return plugins_url( 'css/social-logins.css', __DIR__ );
+            }
+        }
     }
 }

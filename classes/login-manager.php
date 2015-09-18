@@ -69,7 +69,7 @@ namespace wp_oauth_framework {
             wp_register_script( 'wpof-position-social-logins', plugins_url( 'js/position-social-logins.js', __DIR__  ), array( 'jquery'), '1.0', true );
             wp_enqueue_script( 'wpof-position-social-logins' );
 
-            wp_register_style( 'wpof-social-logins', plugins_url( 'css/social-logins.css', __DIR__ ) );
+            wp_register_style( 'wpof-social-logins', Override_Handler::get_style_url_for_theme_override( 'social-logins.css' ) );
             wp_enqueue_style( 'wpof-social-logins' );
 
             foreach( self::get_registered_services() as $registered_service ) {
