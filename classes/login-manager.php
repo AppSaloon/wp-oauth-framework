@@ -23,10 +23,10 @@ namespace wp_oauth_framework {
         }
 
         public function display_login_buttons() {
-            include $this->get_file_path( 'template-social-logins.php' );
+            include Override_Handler::get_file_path_for_theme_override( 'template-social-logins.php' );
         }
 
-        public function get_registered_services() {
+        public static function get_registered_services() {
             $registered_services = array();
             foreach (apply_filters('wpof_registered_services', array()) as $reqistered_service) {
                 if( $reqistered_service->has_valid_api_credentials() ) {
@@ -34,17 +34,6 @@ namespace wp_oauth_framework {
                 }
             }
             return $registered_services;
-        }
-
-        public function get_file_path( $file_name ) {
-            $theme_folder = get_template_directory() . '/wp-oauth-framework/templates';
-            $framework_folder = __DIR__ . '/../templates';
-
-            if( file_exists( $theme_folder . '/' . $file_name ) ) {
-                return $theme_folder . '/' . $file_name;
-            }else {
-                return $framework_folder . '/' . $file_name;
-            }
         }
 
         public function login_init()

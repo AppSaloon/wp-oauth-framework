@@ -20,6 +20,9 @@ defined( 'ABSPATH' ) or die( "No script kiddies please!" );
 require_once __DIR__ . '/classes/login-manager.php';
 require_once __DIR__ . '/classes/admin-menu.php';
 require_once __DIR__ . '/classes/oauth-service.php';
+require_once __DIR__ . '/classes/login-statistics.php';
+require_once __DIR__ . '/classes/override-handler.php';
 
 new \wp_oauth_framework\classes\Admin_Menu();
 new \wp_oauth_framework\Login_Manager();
+new \wp_oauth_framework\classes\Login_Statistics();

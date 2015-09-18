@@ -12,6 +12,7 @@ namespace wp_oauth_framework\classes {
     use fkooman\OAuth\Client\Guzzle3Client;
     use Guzzle\Http\Client;
     use Guzzle\Http\Exception\ClientErrorResponseException;
+    use wp_oauth_framework\Override_Handler;
 
     require_once __DIR__ . '/../vendor/autoload.php';
     require_once __DIR__ . '/wpof-client-config.php';
@@ -189,21 +190,7 @@ namespace wp_oauth_framework\classes {
         }
 
         public function display_login_button() {
-            include $this->get_template_path( 'template-login-button.php' );
-        }
-
-        public function get_template_path( $file_name ) {
-            $theme_folder = get_template_directory() . '/wp-oauth-framework/' . $this->submenu_slug .'/templates';
-            $plugin_folder = $this->get_client_config()->get_plugin_folder() . '/templates';
-            $framework_folder = __DIR__ . '/../templates/';
-
-            if( file_exists( $theme_folder . '/' . $file_name ) ) {
-                return $theme_folder . '/' . $file_name;
-            }elseif( file_exists( $plugin_folder . '/' . $file_name ) ) {
-                return $plugin_folder . '/' . $file_name;
-            }else {
-                return $framework_folder . '/' . $file_name;
-            }
+            include Override_Handler::get_template_path_for_theme_or_extension_override( 'template-login-button.php', $this->submenu_slug, $this->get_client_config()->get_plugin_folder() );
         }
 
         public function display_logo() {
@@ -343,8 +330,9 @@ namespace wp_oauth_framework\classes {
         }
 
         public function login_wp_user( $user_id ) {
-                wp_set_auth_cookie( $user_id, 0, 0);
-                header( 'Location:' . home_url() );
+            wp_set_auth_cookie( $user_id, 0, 0);
+            do_action( 'wpof_oauth_login', $user_id, $this->submenu_slug );
+            header( 'Location:' . home_url() );
         }
 
         public function get_new_user_name( $given_name, $suffix = 0 ) {
