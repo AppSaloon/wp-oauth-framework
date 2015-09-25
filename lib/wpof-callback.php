@@ -27,15 +27,6 @@ use fkooman\OAuth\Client\RefreshToken;
 
 class WPOF_Callback extends Callback
 {
-//    public function __construct(
-//        $clientConfigId,
-//        ClientConfigInterface $clientConfig,
-//        StorageInterface $tokenStorage,
-//        HttpClientInterface $httpClient
-//    ) {
-//        parent::__construct( $clientConfigId, $clientConfig, $tokenStorage, $httpClient );
-//    }
-
     public function handleCallback(array $query)
     {
         $queryState = isset($query['state']) ? $query['state'] : null;

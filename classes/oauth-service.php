@@ -269,8 +269,7 @@ namespace wp_oauth_framework\classes {
 
         public function handle_access_token( WPOF_Access_Token $access_token) {
             $user_info_endpoint = apply_filters(
-                'wpof_user_info_endpoint',
-                $this->service_name,
+                'wpof_user_info_endpoint_' . $this->service_name,
                 $access_token,
                 $this->get_client_config()->get_user_info_endpoint()
             );
