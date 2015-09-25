@@ -83,7 +83,7 @@ namespace wp_oauth_framework {
             if( $service ) {
                 try {
                     /* initialize the Callback */
-                    $cb = new Callback( $service->get_submenu_slug(), $service->get_client_config(), $service->get_token_storage(), new Guzzle3Client());
+                    $cb = new WPOF_Callback( $service->get_submenu_slug(), $service->get_client_config(), $service->get_token_storage(), new Guzzle3Client() );
                     /* handle the callback */
                     $access_token = $cb->handleCallback($_GET);
                     $service->handle_access_token( $access_token );

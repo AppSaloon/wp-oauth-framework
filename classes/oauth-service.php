@@ -13,9 +13,10 @@ namespace wp_oauth_framework\classes {
     use Guzzle\Http\Client;
     use Guzzle\Http\Exception\ClientErrorResponseException;
     use wp_oauth_framework\Override_Handler;
+    use wp_oauth_framework\WPOF_Access_Token;
 
     require_once __DIR__ . '/../vendor/autoload.php';
-    require_once __DIR__ . '/wpof-client-config.php';
+    require_once __DIR__ . '/../lib/wpof-client-config.php';
 
     class Oauth_Service
     {
@@ -266,23 +267,29 @@ namespace wp_oauth_framework\classes {
             }
         }
 
-        public function handle_access_token( AccessToken $access_token) {
+        public function handle_access_token( WPOF_Access_Token $access_token) {
+            $user_info_endpoint = apply_filters(
+                'wpof_user_info_endpoint',
+                $this->service_name,
+                $access_token,
+                $this->get_client_config()->get_user_info_endpoint()
+            );
+
             try {
                 $client = new Client();
                 if( $this->get_client_config()->get_user_info_endpoint_method() == 'post' ) {
-                    $request = $client->post( $this->get_client_config()->get_user_info_endpoint() );
+                    $request = $client->post( $user_info_endpoint );
                 } else {
-                    $request = $client->get( $this->get_client_config()->get_user_info_endpoint() );
+                    $request = $client->get( $user_info_endpoint );
                 }
 
                 $request->addHeader('Authorization', sprintf('Bearer %s', $access_token->getAccessToken()));
 
                 $response = $request->send();
 
-                $user_info = json_decode( (string) $response->getBody() );
+                $user_info = apply_filters( 'wpof_user_info_data_' . $this->service_name, json_decode( (string) $response->getBody(), true ) );
 
-                $user_id_key = $this->get_client_config()->get_user_id_key();
-                $user_id_for_service = $user_info->{$user_id_key};
+                $user_id_for_service = $user_info['user_id'];
 
                 $user_query = new \WP_User_Query(
                     array(
@@ -294,7 +301,7 @@ namespace wp_oauth_framework\classes {
                 $users = $user_query->get_results();
 
                 if( sizeof( $users )  == 0 ) {
-                    $this->create_new_wp_user( $user_info, $user_id_for_service );
+                    $this->create_new_wp_user( $user_info );
                 } elseif( sizeof( $users ) == 1 ) {
                     $this->login_wp_user( $users[0]->ID );
                 } else {
@@ -311,20 +318,18 @@ namespace wp_oauth_framework\classes {
                     header('Location: ' . $this->api->getAuthorizeUri($this->context));
                     exit;
                 }
-
+                echo $e->getMessage(); die;
                 header( 'Location: ' . wp_login_url() . '?wpof_error=' . $this->get_service_name() );
                 die;
             }
         }
 
-        public function create_new_wp_user( $user_info, $user_id_for_service ) {
-            $user_name_key = $this->get_client_config()->get_user_name_key();
-            $user_email_key = $this->get_client_config()->get_user_email_key();
+        public function create_new_wp_user( $user_info ) {
 
-            $user_name = $this->get_new_user_name( $user_info->{$user_name_key} );
+            $user_name = $this->get_new_user_name( $user_info['name'] );
             $password = sha1( openssl_random_pseudo_bytes( 64 ) );
-            $user_id = wp_create_user( $user_name, $password , $user_info->{$user_email_key} );
-            add_user_meta( $user_id, $this->submenu_slug . '_id', $user_id_for_service );
+            $user_id = wp_create_user( $user_name, $password , $user_info['email'] );
+            add_user_meta( $user_id, $this->submenu_slug . '_id', $user_info['user_id'] );
 
             $this->login_wp_user( $user_id );
         }

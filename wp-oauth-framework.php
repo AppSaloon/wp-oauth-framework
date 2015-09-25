@@ -23,6 +23,11 @@ require_once __DIR__ . '/classes/oauth-service.php';
 require_once __DIR__ . '/classes/login-statistics.php';
 require_once __DIR__ . '/classes/override-handler.php';
 
+require_once __DIR__ . '/lib/wpof-callback.php';
+require_once __DIR__ . '/lib/wpof-token-request.php';
+require_once __DIR__ . '/lib/wpof-token-response.php';
+require_once __DIR__ . '/lib/wpof-access-token.php';
+
 new \wp_oauth_framework\classes\Admin_Menu();
 new \wp_oauth_framework\Login_Manager();
 new \wp_oauth_framework\classes\Login_Statistics();

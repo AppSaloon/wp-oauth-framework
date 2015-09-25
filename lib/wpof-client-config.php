@@ -5,14 +5,12 @@ defined( 'ABSPATH' ) or die( "No script kiddies please!" );
 
 use fkooman\OAuth\Client\ClientConfig;
 use fkooman\OAuth\Client\ClientConfigInterface;
+use fkooman\OAuth\Client\Exception\ClientConfigException;
 
 class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
 
     protected $user_info_endpoint;
     protected $user_info_endpoint_method;
-    protected $user_id_key;
-    protected $user_name_key;
-    protected $user_email_key;
     protected $plugin_folder;
     protected $plugin_file;
     protected $style_url;
@@ -26,7 +24,6 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
         }
         $this->user_info_endpoint = $data['user_info_endpoint'];
         $this->user_info_endpoint_method = strtolower( $data['user_info_endpoint_method'] );
-        $this->set_user_info_keys_for_response( $data );
 
         $this->plugin_folder = $data['plugin_folder'];
         $this->plugin_file = $data['plugin_file'];
@@ -37,26 +34,8 @@ class WPOF_Client_Config extends ClientConfig implements ClientConfigInterface {
         parent::__construct( $data );
     }
 
-    public function set_user_info_keys_for_response( $data ) {
-        $this->user_id_key = isset( $data['user_id_key'] ) ? $data['user_id_key'] : 'id';
-        $this->user_name_key = isset( $data['user_name_key'] ) ? $data['user_name_key'] : 'name';
-        $this->user_email_key = isset( $data['user_email_key'] ) ? $data['user_email_key'] : 'email';
-    }
-
     public function get_user_info_endpoint() {
         return $this->user_info_endpoint;
-    }
-
-    public function get_user_id_key() {
-        return $this->user_id_key;
-    }
-
-    public function get_user_name_key() {
-        return $this->user_name_key;
-    }
-
-    public function get_user_email_key() {
-        return $this->user_email_key;
     }
 
     public function get_plugin_folder() {
