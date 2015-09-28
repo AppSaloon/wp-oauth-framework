@@ -185,9 +185,24 @@ namespace wp_oauth_framework\classes {
             return new WPOF_Client_Config( $config_data );
         }
 
-        public function get_login_url()
-        {
-            return wp_login_url() . '?oauth=' . $this->service_name;
+        public function get_login_url() {
+            $path = 'wp-login.php';
+            $scheme = 'login';
+            if ( empty( $blog_id ) || !is_multisite() ) {
+                	                $url = get_option( 'siteurl' );
+            } else {
+                switch_to_blog( $blog_id );
+                $url = get_option( 'siteurl' );
+                restore_current_blog();
+	        }
+
+            $url = set_url_scheme( $url, $scheme );
+
+            if ( $path && is_string( $path ) ) {
+                $url .= '/' . ltrim( $path, '/' );
+            }
+
+            return $url . '?oauth=' . $this->service_name;
         }
 
         public function display_login_button() {
