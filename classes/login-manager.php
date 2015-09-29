@@ -25,7 +25,7 @@ namespace wp_oauth_framework {
 
         }
 
-        public function display_login_buttons() {
+        public static function display_login_buttons() {
             include Override_Handler::get_file_path_for_theme_override( 'template-social-logins.php' );
         }
 
