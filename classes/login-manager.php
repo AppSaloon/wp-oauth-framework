@@ -11,8 +11,11 @@ namespace wp_oauth_framework {
 
     class Login_Manager
     {
+        const CONFIGURATION_ERROR = 1;
+        const NO_EMAIL_ERROR = 2;
 
         protected $service_name;
+        protected $error_code;
 
         public function __construct()
         {
@@ -42,7 +45,14 @@ namespace wp_oauth_framework {
         public function login_init()
         {
             if( isset( $_GET['wpof_error'] ) ) {
-                $this->service_name = $_GET['wpof_error'];
+                $this->error_code = $_GET['wpof_error'];
+
+                if( isset( $_GET['service'] ) ) {
+                    $this->service_name = $_GET['service'];
+                } else {
+                    $this->service_name = __( 'unknown' );
+                }
+
                 add_filter( 'login_message', array( $this, 'login_error_message') );
             } else {
                 remove_filter( 'login_message', array( $this, 'login_error_message') );
@@ -88,8 +98,7 @@ namespace wp_oauth_framework {
                     $access_token = $cb->handleCallback($_GET);
                     $service->handle_access_token( $access_token );
                 } catch (\Exception $e) {
-                    header( 'Location: ' . wp_login_url() . '?wpof_error=' . $_GET['service'] );
-                    die;
+                    $this->redirect_to_login_url_with_error( self::CONFIGURATION_ERROR, $_GET['service'] );
                 }
             } else {
                 echo 'No script kiddies';
@@ -99,10 +108,32 @@ namespace wp_oauth_framework {
 
         public function login_error_message( $message ) {
             if ( empty($message) ){
-                return '<div id="login_error">	<strong>CONFIGURATION ERROR FOR '. $this->service_name . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
+                if( $this->error_code == self::CONFIGURATION_ERROR ) {
+                    return '<div id="login_error">	<strong>CONFIGURATION ERROR FOR '. $this->service_name . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
+                } elseif( $this->error_code == self::NO_EMAIL_ERROR ) {
+                    return '<div id="login_error">	<strong>' . $this->service_name . ' ' . __( 'did not return an email address' ) . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
+                }
             } else {
                 return $message;
             }
+        }
+
+        public static function redirect_to_login_url_with_no_email_error( $service ) {
+            static::redirect_to_login_url_with_error( static::NO_EMAIL_ERROR, $service );
+        }
+
+        public static function redirect_to_login_url_with_config_error( $service ) {
+            static::redirect_to_login_url_with_error( static::CONFIGURATION_ERROR, $service );
+        }
+
+        private static function redirect_to_login_url_with_error( $error_code, $service ) {
+            $args = array(
+                'wpof_error' => $error_code,
+                'service' => $service,
+            );
+            $url = add_query_arg( $args, wp_login_url() );
+            header( 'Location: ' . $url );
+            die;
         }
     }
 }

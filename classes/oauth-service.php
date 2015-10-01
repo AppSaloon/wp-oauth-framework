@@ -12,6 +12,7 @@ namespace wp_oauth_framework\classes {
     use fkooman\OAuth\Client\Guzzle3Client;
     use Guzzle\Http\Client;
     use Guzzle\Http\Exception\ClientErrorResponseException;
+    use wp_oauth_framework\Login_Manager;
     use wp_oauth_framework\Override_Handler;
     use wp_oauth_framework\WPOF_Access_Token;
 
@@ -20,7 +21,6 @@ namespace wp_oauth_framework\classes {
 
     class Oauth_Service
     {
-
 
         protected $service_name;
 
@@ -277,8 +277,7 @@ namespace wp_oauth_framework\classes {
                     $this->handle_access_token( $access_token );
 
                 } catch (Exception $e) {
-                    header( 'Location: ' . wp_login_url() . '?wpof_error=' . $this->get_service_name() );
-                    die;
+                    Login_Manager::redirect_to_login_url_with_config_error( $this->get_service_name() );
                 }
             }
         }
@@ -333,20 +332,22 @@ namespace wp_oauth_framework\classes {
                     header('Location: ' . $this->api->getAuthorizeUri($this->context));
                     exit;
                 }
-                echo $e->getMessage(); die;
-                header( 'Location: ' . wp_login_url() . '?wpof_error=' . $this->get_service_name() );
-                die;
+                Login_Manager::redirect_to_login_url_with_config_error( $this->get_service_name() );
             }
         }
 
         public function create_new_wp_user( $user_info ) {
 
-            $user_name = $this->get_new_user_name( $user_info['name'] );
-            $password = sha1( openssl_random_pseudo_bytes( 64 ) );
-            $user_id = wp_create_user( $user_name, $password , $user_info['email'] );
-            add_user_meta( $user_id, $this->submenu_slug . '_id', $user_info['user_id'] );
+            if( empty( $user_info['email'] ) ) {
+                Login_Manager::redirect_to_login_url_with_no_email_error( $this->get_service_name() );
+            } else {
+                $user_name = $this->get_new_user_name( $user_info['name'] );
+                $password = sha1( openssl_random_pseudo_bytes( 64 ) );
+                $user_id = wp_create_user( $user_name, $password , $user_info['email'] );
+                add_user_meta( $user_id, $this->submenu_slug . '_id', $user_info['user_id'] );
 
-            $this->login_wp_user( $user_id );
+                $this->login_wp_user( $user_id );
+            }
         }
 
         public function login_wp_user( $user_id ) {
