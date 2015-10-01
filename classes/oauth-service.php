@@ -315,7 +315,13 @@ namespace wp_oauth_framework\classes {
                 $users = $user_query->get_results();
 
                 if( sizeof( $users )  == 0 ) {
-                    $this->create_new_wp_user( $user_info );
+                    $user_id = $this->merge_with_existing_wp_user( $user_info );
+
+                    if( ! $user_id ) {
+                        $this->create_new_wp_user( $user_info );
+                    } else {
+                        $this->login_wp_user( $user_id );
+                    }
                 } elseif( sizeof( $users ) == 1 ) {
                     $this->login_wp_user( $users[0]->ID );
                 } else {
@@ -333,6 +339,21 @@ namespace wp_oauth_framework\classes {
                     exit;
                 }
                 Login_Manager::redirect_to_login_url_with_config_error( $this->get_service_name() );
+            }
+        }
+
+        public function merge_with_existing_wp_user( $user_info ) {
+            if( ! empty( $user_info['email'] ) ) {
+                $user = get_user_by( 'email', $user_info['email'] );
+
+                if( $user ) {
+                    update_user_meta( $user->ID, $this->submenu_slug . '_id', $user_info['user_id'] );
+                    return $user->ID;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
             }
         }
 
