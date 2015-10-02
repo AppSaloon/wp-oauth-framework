@@ -108,13 +108,25 @@ namespace wp_oauth_framework {
 
         public function login_error_message( $message ) {
             if ( empty($message) ){
-                if( $this->error_code == self::CONFIGURATION_ERROR ) {
-                    return '<div id="login_error">	<strong>CONFIGURATION ERROR FOR '. $this->service_name . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
-                } elseif( $this->error_code == self::NO_EMAIL_ERROR ) {
-                    return '<div id="login_error">	<strong>' . $this->service_name . ' ' . __( 'did not return an email address' ) . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
-                }
+                return static::get_error_message( $this->error_code, $this->service_name );
             } else {
                 return $message;
+            }
+        }
+
+        private static function get_error_message( $error_code, $service_name ) {
+            if( $error_code == static::CONFIGURATION_ERROR ) {
+                return '<div id="login_error">	<strong>CONFIGURATION ERROR FOR '. $service_name . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
+            } elseif( $error_code == static::NO_EMAIL_ERROR ) {
+                return '<div id="login_error">	<strong>' . $service_name . ' ' . __( 'did not return an email address' ) . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
+            } else {
+                return '';
+            }
+        }
+
+        public static function display_error_message( $get_vars ) {
+            if( isset( $get_vars['wpof_error'] ) && isset( $get_vars['service'] ) ) {
+                echo static::get_error_message( $get_vars['wpof_error'], $get_vars['service'] );
             }
         }
 
