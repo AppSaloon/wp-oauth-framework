@@ -5,6 +5,7 @@ namespace wp_oauth_framework {
 
     use fkooman\OAuth\Client\Callback;
     use fkooman\OAuth\Client\Guzzle3Client;
+    use wp_oauth_framework\classes\Admin_Menu;
     use wp_oauth_framework\classes\Oauth_Service;
 
     require_once __DIR__ . '/../vendor/autoload.php';
@@ -143,7 +144,7 @@ namespace wp_oauth_framework {
                 'wpof_error' => $error_code,
                 'service' => $service,
             );
-            $url = add_query_arg( $args, wp_login_url() );
+            $url = add_query_arg( $args, Admin_Menu::get_error_login_url() );
             header( 'Location: ' . $url );
             die;
         }

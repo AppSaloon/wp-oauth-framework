@@ -374,7 +374,7 @@ namespace wp_oauth_framework\classes {
         public function login_wp_user( $user_id ) {
             wp_set_auth_cookie( $user_id, 0, 0);
             do_action( 'wpof_oauth_login', $user_id, $this->submenu_slug );
-            header( 'Location:' . home_url() );
+            header( 'Location:' . Admin_Menu::get_success_login_url() );
         }
 
         public function get_new_user_name( $given_name, $suffix = 0 ) {
