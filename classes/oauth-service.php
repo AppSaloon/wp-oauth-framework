@@ -358,14 +358,16 @@ namespace wp_oauth_framework\classes {
         }
 
         public function create_new_wp_user( $user_info ) {
-
             if( empty( $user_info['email'] ) ) {
                 Login_Manager::redirect_to_login_url_with_no_email_error( $this->get_service_name() );
             } else {
                 $user_name = $this->get_new_user_name( $user_info['name'] );
                 $password = sha1( openssl_random_pseudo_bytes( 64 ) );
                 $user_id = wp_create_user( $user_name, $password , $user_info['email'] );
-                add_user_meta( $user_id, $this->submenu_slug . '_id', $user_info['user_id'] );
+                update_user_meta( $user_id, $this->submenu_slug . '_id', $user_info['user_id'] );
+
+                update_user_meta( $user_id, 'first_name', $user_info['first_name'] );
+                update_user_meta( $user_id, 'last_name', $user_info['last_name'] );
 
                 $this->login_wp_user( $user_id );
             }
