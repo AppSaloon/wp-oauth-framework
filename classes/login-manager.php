@@ -10,14 +10,40 @@ namespace wp_oauth_framework {
 
     require_once __DIR__ . '/../vendor/autoload.php';
 
+    /**
+     * Class Login_Manager
+     *
+     * This class handles the login flow
+     *
+     * @package wp_oauth_framework
+     */
     class Login_Manager
     {
+        /**
+         * Error number to represent a configuration error (either on WP or OAuth side)
+         */
         const CONFIGURATION_ERROR = 1;
+
+        /**
+         * Error number to represent a missing email address during first time login/registration
+         */
         const NO_EMAIL_ERROR = 2;
 
+        /**
+         * Name of the service that the current user is trying to use to log in
+         * @var
+         */
         protected $service_name;
+
+        /**
+         * Error code for the current user if any
+         * @var
+         */
         protected $error_code;
 
+        /**
+         * Return an instance of Login_Manager and hooks into the necessary WP actions
+         */
         public function __construct()
         {
             add_action('login_form', array($this, 'display_login_buttons'));
@@ -29,10 +55,19 @@ namespace wp_oauth_framework {
 
         }
 
+        /**
+         * Displays the login buttons for all registered services, allows overriding by theme or plugin extension
+         */
         public static function display_login_buttons() {
             include Override_Handler::get_file_path_for_theme_override( 'template-social-logins.php' );
         }
 
+        /**
+         * Returns an array of Oauth_Service instances that have api credentials set in the options page for each service
+         * Makes use of the filter wpof_registered_services
+         *
+         * @return array
+         */
         public static function get_registered_services() {
             $registered_services = array();
             foreach (apply_filters('wpof_registered_services', array()) as $reqistered_service) {
@@ -43,6 +78,10 @@ namespace wp_oauth_framework {
             return $registered_services;
         }
 
+        /**
+         * Runs on login_init and enables displaying of appropriate error.
+         * Starts the OAuth login flow if Oauth service name provides in URL
+         */
         public function login_init()
         {
             if( isset( $_GET['wpof_error'] ) ) {
@@ -64,6 +103,10 @@ namespace wp_oauth_framework {
             }
         }
 
+        /**
+         * Starts the Oauth login flow for given OAuth service or displays error when no valid service name provided
+         * @param $service_name
+         */
         public function start_oauth_service($service_name)
         {
             $service = \wp_oauth_framework\classes\Oauth_Service::get_service_by_name($service_name);
@@ -76,6 +119,9 @@ namespace wp_oauth_framework {
             }
         }
 
+        /**
+         * Loads all scripts and styles for the login page
+         */
         public function enqueue_scripts_and_styles() {
             wp_register_script( 'wpof-position-social-logins', plugins_url( 'js/position-social-logins.js', __DIR__  ), array( 'jquery'), '1.0', true );
             wp_enqueue_script( 'wpof-position-social-logins' );
@@ -88,6 +134,10 @@ namespace wp_oauth_framework {
             }
         }
 
+        /**
+         * Callback function for OAuth provider, exposed using admin-ajax.php, displays error when no valid service
+         * is passed through in the URL
+         */
         public function oauth_callback() {
             $service = Oauth_Service::get_service_by_name( $_GET['service'] );
 
@@ -107,6 +157,12 @@ namespace wp_oauth_framework {
             }
         }
 
+        /**
+         * Returns error message dependant on whether or not there was already a error message set
+         *
+         * @param $message
+         * @return string
+         */
         public function login_error_message( $message ) {
             if ( empty($message) ){
                 return static::get_error_message( $this->error_code, $this->service_name );
@@ -115,6 +171,13 @@ namespace wp_oauth_framework {
             }
         }
 
+        /**
+         * Returns the html for an error message based on $error_code and $service_name
+         *
+         * @param $error_code
+         * @param $service_name
+         * @return string
+         */
         private static function get_error_message( $error_code, $service_name ) {
             if( $error_code == static::CONFIGURATION_ERROR ) {
                 return '<div id="login_error">	<strong>CONFIGURATION ERROR FOR '. $service_name . '</strong>:<br>' . __('Contact administrator') . '<br></div>';
@@ -125,6 +188,11 @@ namespace wp_oauth_framework {
             }
         }
 
+        /**
+         * Displays error message based on passed arguments
+         *
+         * @param $get_vars
+         */
         public static function display_error_message( $get_vars ) {
             if( isset( $get_vars['wpof_error'] ) && isset( $get_vars['service'] ) ) {
                 echo static::get_error_message( $get_vars['wpof_error'], $get_vars['service'] );
