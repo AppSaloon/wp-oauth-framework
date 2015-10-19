@@ -369,6 +369,10 @@ namespace wp_oauth_framework\classes {
                 update_user_meta( $user_id, 'first_name', $user_info['first_name'] );
                 update_user_meta( $user_id, 'last_name', $user_info['last_name'] );
 
+                foreach( apply_filters( 'wpof_extra_user_meta_fields_' . $this->service_name, array() ) as $meta_field_name ) {
+                    update_user_meta( $user_id, $meta_field_name, $user_info[$meta_field_name] );
+                }
+
                 $this->login_wp_user( $user_id );
             }
         }
