@@ -19,23 +19,86 @@ namespace wp_oauth_framework\classes {
     require_once __DIR__ . '/../vendor/autoload.php';
     require_once __DIR__ . '/../lib/wpof-client-config.php';
 
+    /**
+     * Class Oauth_Service
+     *
+     * This class provides all functionality for 'registered' OAuth providers.
+     * Other plugins can add or 'register' additional OAuth providers through the provided filters
+     *
+     * @package wp_oauth_framework\classes
+     */
     class Oauth_Service
     {
 
+        /**
+         * Display name of the OAuth service
+         *
+         * @var
+         */
         protected $service_name;
 
+        /**
+         * Slug used to add the OAuth provider specific settings page to the menu.
+         * Also used as an unique identifier for the OAuth provider
+         *
+         * @var
+         */
         protected $submenu_slug;
+
+        /**
+         * The option group of the OAuth provider's settings
+         * @var
+         */
         protected $option_group;
+
+        /**
+         * Option name under which the OAuth provider's settings will be saved
+         *
+         * @var
+         */
         protected $option_name;
+
+        /**
+         * Options page where the settings of the OAuth provider will be shown
+         *
+         * @var
+         */
         protected $option_page;
+
+        /**
+         * Options section to which the settings fields of the OAuth provider will be added
+         *
+         * @var
+         */
         protected $options_section;
 
+        /**
+         * Configuration parameters stored from the constructor's 2nd argument
+         *
+         * @var
+         */
         protected $config_parameters;
 
+        /**
+         * @var \fkooman\OAuth\Client\SessionStorage
+         */
         protected $token_storage;
+
+        /**
+         * @var \fkooman\OAuth\Client\Api;
+         */
         protected $api;
+
+        /**
+         * @var \fkooman\OAuth\Client\Context
+         */
         protected $context;
 
+        /**
+         * Array of field slugs/ids used for the settings page
+         *
+         * @var array
+         */
         protected $settings_fields = array(
             'client_id', // input in settings
             'client_secret', // input in settings
@@ -47,6 +110,12 @@ namespace wp_oauth_framework\classes {
             'default_token_type', // defined by child plugin
         );
 
+        /**
+         * Creates an instance of Oauth_Service and adds settings pages to the menu
+         *
+         * @param $service_name
+         * @param $config
+         */
         public function __construct($service_name, $config)
         {
             $this->service_name = $service_name;
@@ -60,6 +129,9 @@ namespace wp_oauth_framework\classes {
             add_action( 'wp_logout', array( $this, 'logout') );
         }
 
+        /**
+         * Sets the parameters to add the settings page
+         */
         public function init_settings()
         {
             $this->submenu_slug = 'wpof-' . sanitize_title($this->service_name);
@@ -69,6 +141,12 @@ namespace wp_oauth_framework\classes {
             $this->options_section = $this->submenu_slug . '-settings-section';
         }
 
+        /**
+         * Returns true if there is a client id and a client secret set for the service
+         * in the settings page, returns false if not
+         *
+         * @return bool
+         */
         public function has_valid_api_credentials() {
             $options = get_option( $this->option_name );
 
@@ -84,6 +162,9 @@ namespace wp_oauth_framework\classes {
             return true;
         }
 
+        /**
+         * Creates and stores the instances of classes used from fkooman's library
+         */
         public function create_helper_objects() {
             $this->token_storage = new SessionStorage();
             $this->api = new Api($this->submenu_slug, $this->get_client_config(), $this->token_storage, new Guzzle3Client());
@@ -93,6 +174,9 @@ namespace wp_oauth_framework\classes {
             $this->context = new Context( $_SESSION[$this->submenu_slug]['uuid'] , $this->get_client_config()->get_scope() );
         }
 
+        /**
+         * Adds the settings page
+         */
         public function add_settings()
         {
             register_setting(
@@ -127,6 +211,9 @@ namespace wp_oauth_framework\classes {
             );
         }
 
+        /**
+         * Adds the submenu page to the menu
+         */
         public function add_to_menu()
         {
             add_submenu_page(
@@ -139,16 +226,27 @@ namespace wp_oauth_framework\classes {
             );
         }
 
+        /**
+         * Displays the settings page
+         */
         public function show_settings_page()
         {
             include_once __DIR__ . '/../templates/settings-sub-page.php';
         }
 
+        /**
+         * Displays the settings section
+         */
         public function show_settings_section()
         {
             echo '<p>Settings to enable ' . $this->service_name . ' login.</p>';
         }
 
+        /**
+         * Displays an input field
+         *
+         * @param $args
+         */
         public function show_input_field($args)
         {
             $options = get_option($this->option_name);
@@ -163,17 +261,33 @@ namespace wp_oauth_framework\classes {
         <?php
         }
 
+        /**
+         * Sanitizes the settings for the service
+         *
+         * @param $settings
+         * @return mixed|void
+         */
         public function sanitize_settings($settings)
         {
             $settings = apply_filters('wpof_sanitize_settings_' . $this->service_name, $settings);
             return $settings;
         }
 
+        /**
+         * Returns the name of the Oauth Service
+         *
+         * @return mixed
+         */
         public function get_service_name()
         {
             return $this->service_name;
         }
 
+        /**
+         * Returns the client configuration
+         *
+         * @return WPOF_Client_Config
+         */
         public function get_client_config()
         {
             $options = get_option( $this->option_name );
@@ -185,6 +299,12 @@ namespace wp_oauth_framework\classes {
             return new WPOF_Client_Config( $config_data );
         }
 
+        /**
+         * Returns the url of the login page as defined by WP core, avoiding any filters
+         * that might be applied by other plugins or themes
+         *
+         * @return string
+         */
         public function get_login_url() {
             $path = 'wp-login.php';
             $scheme = 'login';
@@ -205,16 +325,33 @@ namespace wp_oauth_framework\classes {
             return $url . '?oauth=' . $this->service_name;
         }
 
+        /**
+         * Displays the login button, supports overriding by theme or plugins
+         * First looks in the theme folder
+         *
+         */
         public function display_login_button() {
             include Override_Handler::get_template_path_for_theme_or_extension_override( 'template-login-button.php', $this->submenu_slug, $this->get_client_config()->get_plugin_folder() );
         }
 
+        /**
+         * Displays the logo of the service
+         */
         public function display_logo() {
             ?>
             <img src="<?php echo $this->get_image_url( 'logo.png' );?>" >
         <?php
         }
 
+        /**
+         * Returns the url for the image with the given name
+         * First checks the theme folder ({theme}/wp-oauth-framework/{service_submenu_slug}/images,
+         * if no image with the given name is found, checks the plugin folder of the service.
+         * This plugin folder is not the folder of the framework but of the extension using the framework.
+         *
+         * @param $file_name
+         * @return string
+         */
         public function get_image_url( $file_name ) {
             $theme_folder = get_template_directory() . '/wp-oauth-framework/' . $this->submenu_slug . '/images';
             $plugin_folder = $this->get_client_config()->get_plugin_folder() . '/images';
@@ -229,6 +366,9 @@ namespace wp_oauth_framework\classes {
         }
 
         /**
+         * Returns a Oauth_Service object for the given service name
+         * Returns false if no service was registered with the given service name
+         *
          * @param $service_name
          * @return Oauth_Service
          */
@@ -243,16 +383,26 @@ namespace wp_oauth_framework\classes {
         }
 
         /**
-         * @return mixed
+         * Returns the SessionStorage object used for this service
+         *
+         * @return \fkooman\OAuth\Client\SessionStorage
          */
         public function get_token_storage() {
             return $this->token_storage;
         }
 
+        /**
+         * Returns the submenu_slug for this service
+         *
+         * @return string
+         */
         public function get_submenu_slug() {
             return $this->submenu_slug;
         }
 
+        /**
+         * Starts the login flow for this service
+         */
         public function start()
         {
             if( $this->has_valid_api_credentials() ) {
@@ -282,6 +432,11 @@ namespace wp_oauth_framework\classes {
             }
         }
 
+        /**
+         * Handles the login flow using the given access_token
+         *
+         * @param WPOF_Access_Token $access_token
+         */
         public function handle_access_token( WPOF_Access_Token $access_token) {
             $user_info_endpoint = apply_filters(
                 'wpof_user_info_endpoint_' . $this->service_name,
@@ -342,6 +497,13 @@ namespace wp_oauth_framework\classes {
             }
         }
 
+        /**
+         * Checks if given the user info contains an email address of an existing profile
+         * and merges the given user info with data for the user of the matching profile
+         *
+         * @param $user_info
+         * @return bool|int
+         */
         public function merge_with_existing_wp_user( $user_info ) {
             if( ! empty( $user_info['email'] ) ) {
                 $user = get_user_by( 'email', $user_info['email'] );
@@ -357,6 +519,11 @@ namespace wp_oauth_framework\classes {
             }
         }
 
+        /**
+         * Creates a new WordPress user with the given user info
+         *
+         * @param $user_info
+         */
         public function create_new_wp_user( $user_info ) {
             if( empty( $user_info['email'] ) ) {
                 Login_Manager::redirect_to_login_url_with_no_email_error( $this->get_service_name() );
@@ -377,12 +544,24 @@ namespace wp_oauth_framework\classes {
             }
         }
 
+        /**
+         * Logs in the user with given user id
+         *
+         * @param $user_id
+         */
         public function login_wp_user( $user_id ) {
             wp_set_auth_cookie( $user_id, 0, 0);
             do_action( 'wpof_oauth_login', $user_id, $this->submenu_slug );
             header( 'Location:' . Admin_Menu::get_success_login_url() );
         }
 
+        /**
+         * Returns a unique user name by adding a numeric suffix to the given name
+         *
+         * @param $given_name
+         * @param int $suffix
+         * @return string
+         */
         public function get_new_user_name( $given_name, $suffix = 0 ) {
             if( $suffix > 0 ) {
                 $name_to_check = $given_name . $suffix;
@@ -398,12 +577,18 @@ namespace wp_oauth_framework\classes {
 
         }
 
+        /**
+         * Logs out the current user
+         */
         public function logout() {
             if( isset( $_SESSION[$this->submenu_slug] ) ) {
                 unset( $_SESSION[$this->submenu_slug] );
             }
         }
 
+        /**
+         * Loads the css provided by the extension plugin(s)
+         */
         public function enqueue_style() {
             $style_url = $this->get_client_config()->get_style_url();
             if( $style_url ) {
