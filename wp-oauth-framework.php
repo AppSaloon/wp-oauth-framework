@@ -38,8 +38,8 @@ function github_check_for_new_updates( $github_plugins ) {
     $github_plugins[] = array(
         'plugin_file' => __FILE__,
         'github_owner' => 'AppSaloon',
-        'github_project_name' => 'arpu-test-project',
-        'access_token' => '2b2c235880753c72a986c4659154ad69c76acc96'
+        'github_project_name' => 'wp-oauth-framework',
+        'access_token' => '56c82d1c795994bc66a540026b3e02e02052d52c'
     );
 
     return $github_plugins;
