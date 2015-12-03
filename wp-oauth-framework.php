@@ -38,8 +38,7 @@ function github_check_for_new_updates( $github_plugins ) {
     $github_plugins[] = array(
         'plugin_file' => __FILE__,
         'github_owner' => 'AppSaloon',
-        'github_project_name' => 'wp-oauth-framework',
-        'access_token' => 'e2061c14cdc7b2d6eef0eeca6cd66bd27475d055'
+        'github_project_name' => 'wp-oauth-framework'
     );
 
     return $github_plugins;
