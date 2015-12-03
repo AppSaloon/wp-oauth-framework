@@ -31,3 +31,16 @@ require_once __DIR__ . '/lib/wpof-access-token.php';
 new \wp_oauth_framework\classes\Admin_Menu();
 new \wp_oauth_framework\Login_Manager();
 new \wp_oauth_framework\classes\Login_Statistics();
+
+add_filter( 'arpu_github_plugins', 'github_check_for_new_updates' );
+
+function github_check_for_new_updates( $github_plugins ) {
+    $github_plugins[] = array(
+        'plugin_file' => __FILE__,
+        'github_owner' => 'AppSaloon',
+        'github_project_name' => 'arpu-test-project',
+        'access_token' => '2b2c235880753c72a986c4659154ad69c76acc96'
+    );
+
+    return $github_plugins;
+}
