@@ -61,7 +61,6 @@ class Admin_Menu {
      * Creates an instance of Admin_Menu and hooks into necessary WP actions
      */
     public function __construct() {
-        $this->registered_services = apply_filters( 'wpof_registered_services', array() );
         add_action( 'admin_menu', array( $this, 'add_to_menu' ) );
         add_action( 'admin_init', array( $this, 'admin_init' ) );
     }
@@ -80,6 +79,7 @@ class Admin_Menu {
      * Adds the general page to the menu and a settings page for each registered service
      */
     public function add_to_menu() {
+        $this->registered_services = apply_filters( 'wpof_registered_services', array() );
         add_menu_page(
             self::PAGE_TITLE,
             self::MENU_TITLE,

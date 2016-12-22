@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) or die( "No script kiddies please!" );
  * @wordpress-plugin
  * Plugin Name:       WordPress OAuth Framework
  * Description:       WordPress OAuth Framework to enable login with popular services
- * Version:           1.0.2
+ * Version:           1.0.3
  * Author:            Koen Gabriëls
  * Author URI:        http://www.appsaloon.be
  */
